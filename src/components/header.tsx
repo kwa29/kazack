@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ShoppingCart, Search, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,8 +9,16 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { useCartStore } from '@/lib/cart'
 
 export function Header() {
+  // Add a state to track if we're on the client
+  const [isMounted, setIsMounted] = useState(false)
+  
   // Use the cart store to get the cart count
   const cartCount = useCartStore((state) => state.getItemCount())
+
+  // Set isMounted to true after component mounts
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -36,7 +45,7 @@ export function Header() {
         </nav>
 
         {/* Search, Cart, and Mobile Menu */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4" suppressHydrationWarning>
           {/* Search */}
           <div className="hidden md:flex relative w-full max-w-sm items-center">
             <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
@@ -44,14 +53,16 @@ export function Header() {
               type="search"
               placeholder="Search bananas..."
               className="w-full rounded-md pl-8 md:w-[200px] lg:w-[300px]"
+              suppressHydrationWarning
             />
           </div>
 
           {/* Cart */}
           <Link href="/cart">
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" suppressHydrationWarning>
               <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
+              {/* Only render the cart count badge on the client */}
+              {isMounted && cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-yellow-500 text-[10px] font-medium text-white">
                   {cartCount}
                 </span>
@@ -62,7 +73,7 @@ export function Header() {
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="md:hidden" suppressHydrationWarning>
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
@@ -87,6 +98,7 @@ export function Header() {
                     type="search"
                     placeholder="Search bananas..."
                     className="w-full rounded-md pl-8"
+                    suppressHydrationWarning
                   />
                 </div>
               </div>

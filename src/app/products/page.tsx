@@ -1,10 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/lib/cart'
+import { BananaImage } from '@/components/banana-image'
 
 // Define the product type
 interface Product {
@@ -103,6 +105,12 @@ const categories = [
 ]
 
 export default function ProductsPage() {
+  // Get URL search parameters
+  const searchParams = useSearchParams()
+  const categoryParam = searchParams.get('category')
+  const priceParam = searchParams.get('price')
+  const ratingParam = searchParams.get('rating')
+  
   // Get the addItem function from the cart store
   const addItem = useCartStore((state) => state.addItem)
 
@@ -110,13 +118,56 @@ export default function ProductsPage() {
   const handleAddToCart = (product: Product) => {
     addItem(product, 1)
   }
+  
+  // Filter products based on URL parameters
+  let filteredProducts = [...products]
+  
+  // Filter by category
+  if (categoryParam) {
+    filteredProducts = filteredProducts.filter(
+      product => product.category.toLowerCase() === categoryParam.toLowerCase()
+    )
+  }
+  
+  // Filter by price
+  if (priceParam) {
+    switch (priceParam) {
+      case 'under5':
+        filteredProducts = filteredProducts.filter(product => product.price < 5)
+        break
+      case '5to10':
+        filteredProducts = filteredProducts.filter(product => product.price >= 5 && product.price <= 10)
+        break
+      case 'over10':
+        filteredProducts = filteredProducts.filter(product => product.price > 10)
+        break
+    }
+  }
+  
+  // Filter by rating
+  if (ratingParam) {
+    switch (ratingParam) {
+      case '4plus':
+        filteredProducts = filteredProducts.filter(product => product.rating >= 4)
+        break
+      case '3plus':
+        filteredProducts = filteredProducts.filter(product => product.rating >= 3)
+        break
+    }
+  }
+
+  // Get page title based on filters
+  let pageTitle = 'All Bananas'
+  if (categoryParam) {
+    pageTitle = `${categoryParam.charAt(0).toUpperCase() + categoryParam.slice(1)} Bananas`
+  }
 
   return (
     <div className="container py-10">
       <div className="flex flex-col space-y-6">
         {/* Page Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">All Bananas</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{pageTitle}</h1>
           <p className="text-muted-foreground mt-2">
             Browse our selection of premium bananas from around the world.
           </p>
@@ -134,7 +185,12 @@ export default function ProductsPage() {
                   <div key={category.id} className="flex items-center justify-between">
                     <Link 
                       href={category.name === 'All' ? '/products' : `/products?category=${category.name.toLowerCase()}`}
-                      className="text-sm hover:underline"
+                      className={`text-sm hover:underline ${
+                        (category.name === 'All' && !categoryParam) || 
+                        (categoryParam && category.name.toLowerCase() === categoryParam.toLowerCase()) 
+                          ? 'font-medium text-yellow-500' 
+                          : ''
+                      }`}
                     >
                       {category.name}
                     </Link>
@@ -151,17 +207,26 @@ export default function ProductsPage() {
               <h3 className="font-medium">Price Range</h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Link href="/products?price=under5" className="text-sm hover:underline">
+                  <Link 
+                    href="/products?price=under5" 
+                    className={`text-sm hover:underline ${priceParam === 'under5' ? 'font-medium text-yellow-500' : ''}`}
+                  >
                     Under $5
                   </Link>
                 </div>
                 <div className="flex items-center justify-between">
-                  <Link href="/products?price=5to10" className="text-sm hover:underline">
+                  <Link 
+                    href="/products?price=5to10" 
+                    className={`text-sm hover:underline ${priceParam === '5to10' ? 'font-medium text-yellow-500' : ''}`}
+                  >
                     $5 to $10
                   </Link>
                 </div>
                 <div className="flex items-center justify-between">
-                  <Link href="/products?price=over10" className="text-sm hover:underline">
+                  <Link 
+                    href="/products?price=over10" 
+                    className={`text-sm hover:underline ${priceParam === 'over10' ? 'font-medium text-yellow-500' : ''}`}
+                  >
                     Over $10
                   </Link>
                 </div>
@@ -173,12 +238,18 @@ export default function ProductsPage() {
               <h3 className="font-medium">Rating</h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Link href="/products?rating=4plus" className="text-sm hover:underline">
+                  <Link 
+                    href="/products?rating=4plus" 
+                    className={`text-sm hover:underline ${ratingParam === '4plus' ? 'font-medium text-yellow-500' : ''}`}
+                  >
                     4+ Stars
                   </Link>
                 </div>
                 <div className="flex items-center justify-between">
-                  <Link href="/products?rating=3plus" className="text-sm hover:underline">
+                  <Link 
+                    href="/products?rating=3plus" 
+                    className={`text-sm hover:underline ${ratingParam === '3plus' ? 'font-medium text-yellow-500' : ''}`}
+                  >
                     3+ Stars
                   </Link>
                 </div>
@@ -191,7 +262,7 @@ export default function ProductsPage() {
             {/* Sort Options */}
             <div className="flex justify-between items-center mb-6">
               <p className="text-sm text-muted-foreground">
-                Showing <span className="font-medium">{products.length}</span> products
+                Showing <span className="font-medium">{filteredProducts.length}</span> products
               </p>
               <select className="text-sm border rounded-md p-2">
                 <option value="featured">Featured</option>
@@ -203,43 +274,54 @@ export default function ProductsPage() {
 
             {/* Products */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <Card key={product.id} className="overflow-hidden transition-all hover:shadow-md">
-                  <Link href={`/products/${product.id}`}>
-                    <div className="aspect-square relative bg-muted">
-                      {/* Placeholder for product image - in production, use real images */}
-                      <div className="w-full h-full flex items-center justify-center bg-yellow-100">
-                        <span className="text-6xl">🍌</span>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <Card key={product.id} className="overflow-hidden transition-all hover:shadow-md">
+                    <Link href={`/products/${product.id}`}>
+                      <div className="aspect-square relative bg-muted">
+                        {/* Replace emoji placeholder with BananaImage component */}
+                        <BananaImage 
+                          variety={product.name}
+                          size="lg"
+                          className="w-full h-full"
+                        />
                       </div>
-                    </div>
+                    </Link>
+                    <CardHeader className="p-4">
+                      <div className="flex justify-between items-start">
+                        <Link href={`/products/${product.id}`}>
+                          <CardTitle className="text-lg hover:text-yellow-500 transition-colors">
+                            {product.name}
+                          </CardTitle>
+                        </Link>
+                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                          {product.category}
+                        </Badge>
+                      </div>
+                      <CardDescription className="line-clamp-2 h-10">
+                        {product.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardFooter className="p-4 pt-0 flex justify-between items-center">
+                      <span className="font-bold">${product.price.toFixed(2)}</span>
+                      <Button 
+                        size="sm" 
+                        className="bg-yellow-500 hover:bg-yellow-600"
+                        onClick={() => handleAddToCart(product)}
+                      >
+                        Add to Cart
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-12">
+                  <p className="text-lg text-muted-foreground">No products found matching your filters.</p>
+                  <Link href="/products" className="text-yellow-500 hover:underline mt-2 inline-block">
+                    Clear all filters
                   </Link>
-                  <CardHeader className="p-4">
-                    <div className="flex justify-between items-start">
-                      <Link href={`/products/${product.id}`}>
-                        <CardTitle className="text-lg hover:text-yellow-500 transition-colors">
-                          {product.name}
-                        </CardTitle>
-                      </Link>
-                      <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200">
-                        {product.category}
-                      </Badge>
-                    </div>
-                    <CardDescription className="line-clamp-2 h-10">
-                      {product.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardFooter className="p-4 pt-0 flex justify-between items-center">
-                    <span className="font-bold">${product.price.toFixed(2)}</span>
-                    <Button 
-                      size="sm" 
-                      className="bg-yellow-500 hover:bg-yellow-600"
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      Add to Cart
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+                </div>
+              )}
             </div>
 
             {/* Pagination */}

@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { NewsletterForm } from '@/components/newsletter-form'
 
 export function Footer() {
   return (
@@ -78,22 +77,13 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               Subscribe to our newsletter for the latest banana news and exclusive offers.
             </p>
-            <div className="flex space-x-2">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="max-w-[200px]"
-              />
-              <Button variant="default" className="bg-yellow-500 hover:bg-yellow-600">
-                Subscribe
-              </Button>
-            </div>
+            <NewsletterForm />
           </div>
         </div>
 
         {/* Bottom Section */}
         <div className="mt-10 border-t pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-muted-foreground" suppressHydrationWarning>
             © {new Date().getFullYear()} BananaZon. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">

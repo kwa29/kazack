@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/lib/cart'
+import { BananaImage, BananaBunch } from '@/components/banana-image'
 
 // Define the product type
 interface Product {
@@ -93,10 +94,12 @@ export default function Home() {
             </div>
           </div>
           <div className="relative w-full max-w-md aspect-square">
-            {/* Placeholder for hero image - in production, use a real image */}
-            <div className="w-full h-full rounded-full bg-yellow-300 flex items-center justify-center">
-              <span className="text-8xl">🍌</span>
-            </div>
+            {/* Replace emoji with BananaBunch component */}
+            <BananaBunch 
+              variety="Organic Cavendish"
+              size="xl"
+              className="w-full h-full"
+            />
           </div>
         </div>
       </section>
@@ -118,10 +121,12 @@ export default function Home() {
             {featuredProducts.map((product) => (
               <Card key={product.id} className="overflow-hidden transition-all hover:shadow-md">
                 <div className="aspect-square relative bg-muted">
-                  {/* Placeholder for product image - in production, use real images */}
-                  <div className="w-full h-full flex items-center justify-center bg-yellow-100">
-                    <span className="text-6xl">🍌</span>
-                  </div>
+                  {/* Replace emoji with BananaImage component */}
+                  <BananaImage 
+                    variety={product.name}
+                    size="lg"
+                    className="w-full h-full"
+                  />
                 </div>
                 <CardHeader className="p-4">
                   <div className="flex justify-between items-start">
@@ -159,10 +164,14 @@ export default function Home() {
               <Link key={category.id} href={`/categories/${category.name.toLowerCase()}`}>
                 <Card className="overflow-hidden transition-all hover:shadow-md h-full">
                   <div className="aspect-video relative bg-muted">
-                    {/* Placeholder for category image - in production, use real images */}
-                    <div className="w-full h-full flex items-center justify-center bg-yellow-100">
-                      <span className="text-4xl">🍌</span>
-                    </div>
+                    {/* Replace emoji with BananaImage component using category name */}
+                    <BananaImage 
+                      variety={category.name === 'Organic' ? 'Organic Cavendish' : 
+                               category.name === 'Exotic' ? 'Red Bananas' :
+                               category.name === 'Specialty' ? 'Baby Bananas' : 'Plantains'}
+                      size="md"
+                      className="w-full h-full"
+                    />
                   </div>
                   <CardContent className="p-4">
                     <h3 className="font-medium text-lg">{category.name}</h3>
