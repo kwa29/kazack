@@ -13,7 +13,7 @@ export function Footer() {
               <span className="text-xl font-bold text-yellow-500">🍌 BananaZon</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              The world's premier destination for premium banana products.
+              The world&apos;s premier destination for premium banana products.
               Delivering fresh, organic bananas to your doorstep since 2024.
             </p>
           </div>
