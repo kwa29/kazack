@@ -85,11 +85,11 @@ export default function Home() {
               Fresh, delicious, and delivered right to your doorstep.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600">
-                Shop Now
+              <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600" asChild>
+                <Link href="/products">Shop Now</Link>
               </Button>
-              <Button size="lg" variant="outline">
-                Learn More
+              <Button size="lg" variant="outline" asChild>
+                <Link href="/about">Learn More</Link>
               </Button>
             </div>
           </div>
@@ -227,8 +227,8 @@ export default function Home() {
           <p className="text-xl mb-8 max-w-2xl mx-auto">
             Join thousands of happy customers who have made BananaZon their go-to source for premium bananas.
           </p>
-          <Button size="lg" className="bg-white text-yellow-500 hover:bg-yellow-50">
-            Start Shopping Now
+          <Button size="lg" className="bg-white text-yellow-500 hover:bg-yellow-50" asChild>
+            <Link href="/products">Start Shopping Now</Link>
           </Button>
         </div>
       </section>
