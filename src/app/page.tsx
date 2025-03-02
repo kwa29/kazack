@@ -1,10 +1,23 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useCartStore } from '@/lib/cart'
+
+// Define the product type
+interface Product {
+  id: number
+  name: string
+  description: string
+  price: number
+  image: string
+  category: string
+}
 
 // Mock data for featured products
-const featuredProducts = [
+const featuredProducts: Product[] = [
   {
     id: 1,
     name: 'Organic Cavendish Bananas',
@@ -12,7 +25,6 @@ const featuredProducts = [
     price: 4.99,
     image: '/images/cavendish.jpg',
     category: 'Organic',
-    rating: 4.8,
   },
   {
     id: 2,
@@ -21,7 +33,6 @@ const featuredProducts = [
     price: 6.99,
     image: '/images/red-banana.jpg',
     category: 'Exotic',
-    rating: 4.5,
   },
   {
     id: 3,
@@ -30,7 +41,6 @@ const featuredProducts = [
     price: 7.99,
     image: '/images/baby-banana.jpg',
     category: 'Specialty',
-    rating: 4.7,
   },
   {
     id: 4,
@@ -39,7 +49,6 @@ const featuredProducts = [
     price: 5.99,
     image: '/images/plantain.jpg',
     category: 'Cooking',
-    rating: 4.6,
   },
 ]
 
@@ -52,6 +61,14 @@ const categories = [
 ]
 
 export default function Home() {
+  // Get the addItem function from the cart store
+  const addItem = useCartStore((state) => state.addItem)
+
+  // Handle adding a product to the cart
+  const handleAddToCart = (product: Product) => {
+    addItem(product, 1)
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -119,7 +136,11 @@ export default function Home() {
                 </CardHeader>
                 <CardFooter className="p-4 pt-0 flex justify-between items-center">
                   <span className="font-bold">${product.price.toFixed(2)}</span>
-                  <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600">
+                  <Button 
+                    size="sm" 
+                    className="bg-yellow-500 hover:bg-yellow-600"
+                    onClick={() => handleAddToCart(product)}
+                  >
                     Add to Cart
                   </Button>
                 </CardFooter>

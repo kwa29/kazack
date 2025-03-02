@@ -5,10 +5,11 @@ import { ShoppingCart, Search, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { useCartStore } from '@/lib/cart'
 
 export function Header() {
-  // Using a simple variable instead of state since we're not updating it in this component
-  const cartCount = 0
+  // Use the cart store to get the cart count
+  const cartCount = useCartStore((state) => state.getItemCount())
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

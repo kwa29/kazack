@@ -1,10 +1,24 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useCartStore } from '@/lib/cart'
+
+// Define the product type
+interface Product {
+  id: number
+  name: string
+  description: string
+  price: number
+  image: string
+  category: string
+  rating: number
+}
 
 // Mock data for products
-const products = [
+const products: Product[] = [
   {
     id: 1,
     name: 'Organic Cavendish Bananas',
@@ -89,6 +103,14 @@ const categories = [
 ]
 
 export default function ProductsPage() {
+  // Get the addItem function from the cart store
+  const addItem = useCartStore((state) => state.addItem)
+
+  // Handle adding a product to the cart
+  const handleAddToCart = (product: Product) => {
+    addItem(product, 1)
+  }
+
   return (
     <div className="container py-10">
       <div className="flex flex-col space-y-6">
@@ -208,7 +230,11 @@ export default function ProductsPage() {
                   </CardHeader>
                   <CardFooter className="p-4 pt-0 flex justify-between items-center">
                     <span className="font-bold">${product.price.toFixed(2)}</span>
-                    <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600">
+                    <Button 
+                      size="sm" 
+                      className="bg-yellow-500 hover:bg-yellow-600"
+                      onClick={() => handleAddToCart(product)}
+                    >
                       Add to Cart
                     </Button>
                   </CardFooter>

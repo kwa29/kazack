@@ -1,15 +1,21 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useCartStore } from '@/lib/cart'
 
 // Define the correct types for the page props
-type Params = Promise<{ id: string }>
+interface Params {
+  id: string
+}
 
-type ProductPageProps = {
+interface ProductPageProps {
   params: Params
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 // Mock data for products
@@ -100,14 +106,40 @@ const relatedProducts = [
   },
 ]
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default function ProductPage({ params }: ProductPageProps) {
   // Get the ID from params
-  const { id } = await params
-  const productId = parseInt(id)
+  const productId = parseInt(params.id)
   const product = products.find(p => p.id === productId)
+  
+  // State for quantity
+  const [quantity, setQuantity] = useState(1)
+  
+  // Get cart functions from store
+  const addItem = useCartStore((state) => state.addItem)
   
   if (!product) {
     notFound()
+  }
+
+  // Handle quantity changes
+  const decreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1)
+    }
+  }
+  
+  const increaseQuantity = () => {
+    setQuantity(quantity + 1)
+  }
+  
+  // Handle add to cart for the main product
+  const handleAddToCart = () => {
+    addItem(product, quantity)
+  }
+  
+  // Handle add to cart for related products
+  const handleAddRelatedToCart = (relatedProduct: typeof relatedProducts[0]) => {
+    addItem(relatedProduct, 1)
   }
 
   return (
@@ -192,11 +224,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
               <div className="flex items-center space-x-4">
                 <div className="flex items-center border rounded-md">
-                  <button className="px-3 py-2 text-lg">-</button>
-                  <span className="px-3 py-2">{product.quantity || 1}</span>
-                  <button className="px-3 py-2 text-lg">+</button>
+                  <button 
+                    onClick={decreaseQuantity} 
+                    className="px-3 py-2 text-lg"
+                  >
+                    -
+                  </button>
+                  <span className="px-3 py-2">{quantity}</span>
+                  <button 
+                    onClick={increaseQuantity} 
+                    className="px-3 py-2 text-lg"
+                  >
+                    +
+                  </button>
                 </div>
-                <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600">
+                <Button 
+                  size="lg" 
+                  className="bg-yellow-500 hover:bg-yellow-600"
+                  onClick={() => handleAddToCart()}
+                  disabled={!product.inStock}
+                >
                   Add to Cart
                 </Button>
               </div>
@@ -287,7 +334,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   </CardHeader>
                   <CardFooter className="p-4 pt-0 flex justify-between items-center">
                     <span className="font-bold">${product.price.toFixed(2)}</span>
-                    <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600">
+                    <Button 
+                      size="sm" 
+                      className="bg-yellow-500 hover:bg-yellow-600"
+                      onClick={() => handleAddRelatedToCart(product)}
+                    >
                       Add to Cart
                     </Button>
                   </CardFooter>

@@ -1,49 +1,20 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Trash2, Plus, Minus } from 'lucide-react'
-
-// Mock data for cart items
-const initialCartItems = [
-  {
-    id: 1,
-    name: 'Organic Cavendish Bananas',
-    description: 'Sweet and creamy classic bananas, perfect for everyday enjoyment.',
-    price: 4.99,
-    image: '/images/cavendish.jpg',
-    category: 'Organic',
-    quantity: 2,
-  },
-  {
-    id: 2,
-    name: 'Red Bananas',
-    description: 'Sweeter than yellow bananas with a hint of raspberry flavor.',
-    price: 6.99,
-    image: '/images/red-banana.jpg',
-    category: 'Exotic',
-    quantity: 1,
-  },
-]
+import { useCartStore } from '@/lib/cart'
 
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState(initialCartItems)
+  // Use the cart store
+  const cartItems = useCartStore((state) => state.items)
+  const updateQuantity = useCartStore((state) => state.updateQuantity)
+  const removeItem = useCartStore((state) => state.removeItem)
+  const getSubtotal = useCartStore((state) => state.getSubtotal)
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ))
-  }
-
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter(item => item.id !== id))
-  }
-
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const subtotal = getSubtotal()
   const shipping = subtotal > 0 ? 5.99 : 0
   const total = subtotal + shipping
 
@@ -97,7 +68,7 @@ export default function CartPage() {
                     <div className="flex justify-between items-center">
                       <div className="flex items-center border rounded-md">
                         <button 
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                           className="p-2"
                         >
                           <Minus className="h-4 w-4" />
