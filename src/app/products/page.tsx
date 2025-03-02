@@ -7,6 +7,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/comp
 import { Badge } from '@/components/ui/badge'
 import { useCartStore } from '@/lib/cart'
 import { BananaImage } from '@/components/banana-image'
+import { Suspense } from 'react'
 
 // Define the product type
 interface Product {
@@ -104,7 +105,8 @@ const categories = [
   { id: 5, name: 'Cooking', count: products.filter(p => p.category === 'Cooking').length },
 ]
 
-export default function ProductsPage() {
+// Create a separate component that uses useSearchParams
+function ProductsContent() {
   // Get URL search parameters
   const searchParams = useSearchParams()
   const categoryParam = searchParams.get('category')
@@ -348,5 +350,61 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+// Loading fallback component
+function ProductsLoading() {
+  return (
+    <div className="container py-10">
+      <div className="flex flex-col space-y-6">
+        <div>
+          <div className="h-8 w-48 bg-muted animate-pulse rounded-md"></div>
+          <div className="h-4 w-96 bg-muted animate-pulse rounded-md mt-2"></div>
+        </div>
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="w-full lg:w-64 space-y-6">
+            <div className="space-y-4">
+              <div className="h-5 w-24 bg-muted animate-pulse rounded-md"></div>
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="h-4 w-20 bg-muted animate-pulse rounded-md"></div>
+                    <div className="h-4 w-6 bg-muted animate-pulse rounded-md"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm">
+                  <div className="aspect-square bg-muted animate-pulse"></div>
+                  <div className="p-4">
+                    <div className="h-5 w-32 bg-muted animate-pulse rounded-md mb-2"></div>
+                    <div className="h-4 w-full bg-muted animate-pulse rounded-md"></div>
+                    <div className="h-4 w-3/4 bg-muted animate-pulse rounded-md mt-1"></div>
+                    <div className="flex justify-between items-center mt-4">
+                      <div className="h-5 w-12 bg-muted animate-pulse rounded-md"></div>
+                      <div className="h-8 w-24 bg-muted animate-pulse rounded-md"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Main page component with Suspense
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<ProductsLoading />}>
+      <ProductsContent />
+    </Suspense>
   )
 } 

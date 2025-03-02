@@ -5,6 +5,14 @@ All notable changes to the BananaZon project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.9] - 2024-03-04
+
+### Fixed
+- Fixed Next.js build error related to useSearchParams() by adding proper Suspense boundaries
+- Restructured products page to separate components that use client-side hooks
+- Added loading skeleton UI for products page during initial load
+- Improved compliance with Next.js App Router best practices
+
 ## [0.3.8] - 2024-03-04
 
 ### Changed
