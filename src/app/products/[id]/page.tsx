@@ -4,6 +4,14 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
+// Define the correct types for the page props
+type Params = Promise<{ id: string }>
+
+type ProductPageProps = {
+  params: Params
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
 // Mock data for products
 const products = [
   {
@@ -92,8 +100,8 @@ const relatedProducts = [
   },
 ]
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
-  // Await the params to properly handle dynamic route parameters
+export default async function ProductPage({ params }: ProductPageProps) {
+  // Get the ID from params
   const { id } = await params
   const productId = parseInt(id)
   const product = products.find(p => p.id === productId)
